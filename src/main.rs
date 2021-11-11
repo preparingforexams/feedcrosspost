@@ -100,6 +100,10 @@ async fn get_feed_items(offset_minutes: i64) -> Result<Vec<FeedItem>, anyhow::Er
     Ok(Vec::new().into())
 }
 
+fn get_new_reddit_posts(limit: u32) -> Vec<()> {
+    vec![]
+}
+
 async fn get_reddit_client() -> anyhow::Result<Me> {
     let client: Result<Me, RouxError> = Reddit::new(env::var("USER_AGENT")?.as_str(), env::var("CLIENT_ID")?.as_str(), env::var("CLIENT_SECRET")?.as_str())
         .username(env::var("REDDIT_USERNAME")?.as_str())
