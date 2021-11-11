@@ -41,6 +41,7 @@ WORKDIR /app
 
 # Copy our build
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/feedcrosspost ./
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Use an unprivileged user.
 USER worker:worker
