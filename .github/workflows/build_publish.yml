@@ -1,0 +1,43 @@
+name: Build/Publish docker image
+
+on:
+  push:
+    branches:
+      - feature/rust
+
+jobs:
+  build_push_docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the tagged Docker image
+        run: docker build -t ghcr.io/torbencarstens/feedcrosspost:${GITHUB_SHA} .
+      - name: Push the tagged Docker image
+        run: docker push ghcr.io/torbencarstens/feedcrosspost:${GITHUB_SHA}
+  deploy:
+    name: "Publish to k8s"
+    runs-on: ubuntu-latest
+    needs: build_push_docker
+    steps:
+      - uses: actions/checkout@v1
+      - name: update tag in manifest.yml
+        run: sed -i -e "s#{{tag}}#$(echo ${GITHUB_SHA})#g" .kubernetes/manifest.yaml
+      - name: update client_id
+        run: sed -i -e "s#__CLIENT_ID__#$(echo ${{ secrets.CLIENT_ID }})#g" .kubernetes/manifest.yaml
+      - name: update client_secret
+        run: sed -i -e "s#__CLIENT_SECRET__#$(echo ${{ secrets.CLIENT_SECRET }})#g" .kubernetes/manifest.yaml
+      - name: update reddit_username
+        run: sed -i -e "s#__REDDIT_USERNAME__#$(echo ${{ secrets.REDDIT_USERNAME }})#g" .kubernetes/manifest.yaml
+      - name: update reddit_password
+        run: sed -i -e "s#__REDDIT_PASSWORD__#$(echo ${{ secrets.REDDIT_PASSWORD }})#g" .kubernetes/manifest.yaml
+      - uses: danielr1996/kubectl-action@1.0.0
+        name: apply config
+        with:
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+          args: apply -f .kubernetes/manifest.yaml

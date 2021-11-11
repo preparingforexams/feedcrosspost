@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: feedcrosspost
+  namespace: telegram-bots
+spec:
+  schedule: "*/30 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+          - name: scraper
+            image: ghcr.io/torbencarstens/feedcrosspost:{{tag}}
+            envFrom:
+            - secretRef:
+                name: reddit-credentials
+            - configMapRef:
+                name: feedcrosspost-config
+          restartPolicy: Never
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feedcrosspost-config
+  namespace: telegram-bots
+data:
+  FEED_URL: "https://kerkour.com/feed.json"
+  SUBREDDIT_NAME: "bloomcirclejerk"
+  TIME_OFFSET_MINUTES: "30"
+  USER_AGENT: "script:feedcrosspost:v0.0.1 (by /u/chabare)"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: reddit-credentials
+  namespace: telegram-bots
+data:
+  CLIENT_ID: "__CLIENT_ID__"
+  CLIENT_SECRET: "__CLIENT_SECRET__"
+  REDDIT_USERNAME: "__REDDIT_USERNAME__"
+  REDDIT_PASSWORD: "__REDDIT_PASSWORD__"
