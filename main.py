@@ -16,14 +16,18 @@ def retrieve_feed(url: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def in_timeframe(value: datetime, start: datetime, end: datetime) -> bool:
+def in_timeframe(value: Optional[datetime], start: datetime, end: datetime) -> bool:
     if value is None:
         return False
 
     return start < value < end
 
 
-def convert_timestamp(timestamp, is_timestamp=False, is_timestamp_nanosecond=False) -> datetime:
+def convert_timestamp(
+    timestamp: str,
+    is_timestamp=False,
+    is_timestamp_nanosecond=False,
+) -> datetime:
     if not (is_timestamp or is_timestamp_nanosecond):
         try:
             time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
@@ -51,8 +55,13 @@ def post_to_reddit(subreddit: str, blogpost: Dict[str, Any]):
     username = os.getenv("REDDIT_USERNAME")
     password = os.getenv("REDDIT_PASSWORD")
     try:
-        client = praw.Reddit(client_id=client_id, client_secret=client_secret, username=username, password=password,
-                             user_agent=os.getenv("USER_AGENT"))
+        client = praw.Reddit(
+            client_id=client_id,
+            client_secret=client_secret,
+            username=username,
+            password=password,
+            user_agent=os.getenv("USER_AGENT"),
+        )
         client.validate_on_submit = True
     except ResponseException as e:
         print("login failed ", e)
@@ -78,7 +87,11 @@ def main(feed_url: str, time_offset_minutes: int, subreddit: str):
     feed_items = feed.get("items")
     end = datetime.utcnow().replace(tzinfo=pytz.utc)
     start = end - timedelta(minutes=time_offset_minutes)
-    new_blogposts = [item for item in feed_items if in_timeframe(parse_date_published(item), start, end)]
+    new_blogposts = [
+        item
+        for item in feed_items
+        if in_timeframe(parse_date_published(item), start, end)
+    ]
 
     for blogpost in new_blogposts:
         if not post_to_reddit(subreddit, blogpost):
