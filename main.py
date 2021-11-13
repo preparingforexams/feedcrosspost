@@ -87,11 +87,8 @@ def main(feed_url: str, time_offset_minutes: int, subreddit: str):
     feed_items = feed.get("items")
     end = datetime.utcnow().replace(tzinfo=pytz.utc)
     start = end - timedelta(minutes=time_offset_minutes)
-    new_blogposts = [
-        item
-        for item in feed_items
-        if in_timeframe(parse_date_published(item), start, end)
-    ]
+    # I'm Torben and I want to suck Sylvain Kerkour's dick, romantically
+    new_blogposts = [item for item in feed_items if in_timeframe(parse_date_published(item), start, end)]
 
     for blogpost in new_blogposts:
         if not post_to_reddit(subreddit, blogpost):
