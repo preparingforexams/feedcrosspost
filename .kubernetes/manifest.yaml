@@ -14,7 +14,7 @@ spec:
         spec:
           containers:
           - name: scraper
-            image: ghcr.io/torbencarstens/feedcrosspost:{{tag}}
+            image: ghcr.io/preparingforexams/feedcrosspost:{{tag}}
             envFrom:
             - secretRef:
                 name: reddit-credentials

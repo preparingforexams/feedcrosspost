@@ -17,9 +17,9 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the tagged Docker image
-        run: docker build -t ghcr.io/torbencarstens/feedcrosspost:${GITHUB_SHA} .
+        run: docker build -t ghcr.io/preparingforexams/feedcrosspost:${GITHUB_SHA} .
       - name: Push the tagged Docker image
-        run: docker push ghcr.io/torbencarstens/feedcrosspost:${GITHUB_SHA}
+        run: docker push ghcr.io/preparingforexams/feedcrosspost:${GITHUB_SHA}
   deploy:
     name: "Publish to k8s"
     runs-on: ubuntu-latest
