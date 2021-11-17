@@ -30,7 +30,7 @@ metadata:
 data:
   FEED_URL: "https://kerkour.com/feed.json"
   SUBREDDIT_NAME: "bloomcirclejerk"
-  TIME_OFFSET_MINUTES: "30"
+  TIME_OFFSET_MINUTES: "60"
   USER_AGENT: "script:feedcrosspost:v0.0.1 (by /u/chabare)"
 ---
 apiVersion: v1

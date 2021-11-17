@@ -88,6 +88,6 @@ def main(feed_url: str, time_offset_minutes: int, subreddit: str):
 
 if __name__ == "__main__":
     feed_url = os.getenv("FEED_URL")
-    time_offset_minutes = int(os.getenv("TIME_OFFSET_MINUTES", "30"))
+    time_offset_minutes = int(os.getenv("TIME_OFFSET_MINUTES", "60"))
     subreddit = os.getenv("SUBREDDIT_NAME")
     main(feed_url, time_offset_minutes, subreddit)
